@@ -8,7 +8,6 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
-import com.hypixel.hytale.protocol.packets.interface_.Page;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
@@ -22,6 +21,10 @@ import com.hypixel.hytale.server.core.util.AuthUtil;
 import javax.annotation.Nonnull;
 
 public class AddPlayerPage extends InteractiveCustomUIPage<AddPlayerPage.AddEventData> {
+
+    // Store references for async callback navigation
+    private Ref<EntityStore> currentRef;
+    private Store<EntityStore> currentStore;
 
     public static class AddEventData {
         public String action;
@@ -72,12 +75,15 @@ public class AddPlayerPage extends InteractiveCustomUIPage<AddPlayerPage.AddEven
         @Nonnull Store<EntityStore> store,
         @Nonnull AddEventData data
     ) {
+        // Store references for async navigation
+        this.currentRef = ref;
+        this.currentStore = store;
+
         Player player = (Player) store.getComponent(ref, Player.getComponentType());
 
         if ("Cancel".equals(data.action)) {
             // Go back to whitelist page
-            WhitelistPage whitelistPage = new WhitelistPage(playerRef);
-            player.getPageManager().openCustomPage(ref, store, whitelistPage);
+            navigateToWhitelistPage();
             return;
         }
 
@@ -102,15 +108,23 @@ public class AddPlayerPage extends InteractiveCustomUIPage<AddPlayerPage.AddEven
                     playerRef.sendMessage(Message.raw(finalUsername + " is already whitelisted"));
                 }
 
-                // Note: Can't easily go back to WhitelistPage from async context
-                // User will need to close and reopen
+                // Navigate back to whitelist page
+                navigateToWhitelistPage();
             }).exceptionally(ex -> {
                 playerRef.sendMessage(Message.raw("Failed to find player: " + finalUsername));
+                navigateToWhitelistPage();
                 return null;
             });
+        }
+    }
 
-            // Close the page
-            player.getPageManager().setPage(ref, store, Page.None);
+    private void navigateToWhitelistPage() {
+        if (currentRef != null && currentStore != null) {
+            Player player = (Player) currentStore.getComponent(currentRef, Player.getComponentType());
+            if (player != null) {
+                WhitelistPage whitelistPage = new WhitelistPage(playerRef);
+                player.getPageManager().openCustomPage(currentRef, currentStore, whitelistPage);
+            }
         }
     }
 

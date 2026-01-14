@@ -17,8 +17,11 @@ import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import javax.annotation.Nonnull;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -97,15 +100,26 @@ public class WhitelistPage extends InteractiveCustomUIPage<WhitelistPage.Whiteli
             return;
         }
 
+        // Try to get usernames for all whitelisted players
+        Map<UUID, String> usernames = new HashMap<>();
+        for (UUID uuid : whitelist) {
+            PlayerRef onlinePlayer = Universe.get().getPlayer(uuid);
+            if (onlinePlayer != null) {
+                usernames.put(uuid, onlinePlayer.getUsername());
+            }
+        }
+
         int i = 0;
         for (UUID uuid : whitelist) {
             String selector = "#PlayerList[" + i + "]";
             commandBuilder.append("#PlayerList", "Pages/WhitelistEntry.ui");
 
-            // For now, show UUID - username resolution could be async
-            String displayName = uuid.toString().substring(0, 8) + "...";
+            // Show username if available, otherwise show shortened UUID
+            String displayName = usernames.getOrDefault(uuid, uuid.toString().substring(0, 8) + "...");
+            String statusText = usernames.containsKey(uuid) ? "(online)" : uuid.toString();
+
             commandBuilder.set(selector + " #PlayerName.Text", displayName);
-            commandBuilder.set(selector + " #PlayerUUID.Text", uuid.toString());
+            commandBuilder.set(selector + " #PlayerUUID.Text", statusText);
 
             eventBuilder.addEventBinding(
                 CustomUIEventBindingType.Activating,
