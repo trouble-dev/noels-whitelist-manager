@@ -10,6 +10,3 @@ build/
 # OS
 .DS_Store
 Thumbs.db
-
-# Libs (symlinked)
-libs/
