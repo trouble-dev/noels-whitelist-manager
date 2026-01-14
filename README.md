@@ -61,14 +61,17 @@ Output: `build/libs/WhitelistPlugin-1.0.0.jar`
 GitHub Actions baut automatisch bei:
 - **Push auf `main`** → Build + JAR als Artifact
 - **Pull Requests** → Build-Validierung
-- **Version Tags (`v*`)** → Build + GitHub Release mit JAR
+- **Manual Trigger** → Build + GitHub Release mit JAR
 
 ### Neues Release erstellen
 
-```bash
-git tag v1.1.0
-git push origin v1.1.0
-```
+1. Gehe zu [Actions](../../actions) → "Build and Release"
+2. Klicke "Run workflow"
+3. Wähle Version-Typ:
+   - `patch` → 1.0.0 → 1.0.1 (Bugfixes)
+   - `minor` → 1.0.0 → 1.1.0 (Neue Features)
+   - `major` → 1.0.0 → 2.0.0 (Breaking Changes)
+4. Klicke "Run workflow"
 
 Das Release erscheint dann unter [Releases](../../releases) mit der JAR zum Download.
 
