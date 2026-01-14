@@ -15,6 +15,7 @@ public class WhitelistUICommand extends AbstractPlayerCommand {
 
     public WhitelistUICommand() {
         super("wl", "Opens the whitelist management UI");
+        requirePermission("whitelist.manage");  // Nur OPs oder Spieler mit dieser Permission
     }
 
     @Override
