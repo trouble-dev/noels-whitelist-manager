@@ -56,6 +56,22 @@ If you add a player using a fake UUID (from `AuthUtil.lookupUuid()`), the whitel
 
 Output: `build/libs/WhitelistPlugin-1.0.0.jar`
 
+## CI/CD
+
+GitHub Actions baut automatisch bei:
+- **Push auf `main`** → Build + JAR als Artifact
+- **Pull Requests** → Build-Validierung
+- **Version Tags (`v*`)** → Build + GitHub Release mit JAR
+
+### Neues Release erstellen
+
+```bash
+git tag v1.1.0
+git push origin v1.1.0
+```
+
+Das Release erscheint dann unter [Releases](../../releases) mit der JAR zum Download.
+
 ## Installation
 
 Copy the JAR file to your Hytale server's `mods/` folder.
