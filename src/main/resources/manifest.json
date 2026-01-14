@@ -1,0 +1,7 @@
+{
+  "Group": "Whitelist",
+  "Name": "WhitelistPlugin",
+  "Version": "1.0.0",
+  "Main": "de.noel.whitelist.WhitelistPlugin",
+  "IncludesAssetPack": true
+}
