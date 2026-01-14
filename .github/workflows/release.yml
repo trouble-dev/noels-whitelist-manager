@@ -40,17 +40,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Build JAR
-        run: ./gradlew jar
-
-      - name: Upload JAR artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: WhitelistPlugin
-          path: build/libs/*.jar
-
       - name: Get current version
-        if: github.event_name == 'workflow_dispatch'
         id: current
         run: |
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
@@ -58,32 +48,46 @@ jobs:
           echo "Current version: $LATEST_TAG"
 
       - name: Calculate new version
-        if: github.event_name == 'workflow_dispatch'
         id: version
         run: |
           CURRENT="${{ steps.current.outputs.tag }}"
           CURRENT="${CURRENT#v}"
 
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
 
-          case "${{ inputs.bump }}" in
-            major)
-              MAJOR=$((MAJOR + 1))
-              MINOR=0
-              PATCH=0
-              ;;
-            minor)
-              MINOR=$((MINOR + 1))
-              PATCH=0
-              ;;
-            patch)
-              PATCH=$((PATCH + 1))
-              ;;
-          esac
+            case "${{ inputs.bump }}" in
+              major)
+                MAJOR=$((MAJOR + 1))
+                MINOR=0
+                PATCH=0
+                ;;
+              minor)
+                MINOR=$((MINOR + 1))
+                PATCH=0
+                ;;
+              patch)
+                PATCH=$((PATCH + 1))
+                ;;
+            esac
 
-          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+            NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          else
+            # Für normale Pushes: aktuelle Version oder "dev"
+            NEW_VERSION="$CURRENT"
+          fi
+
           echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          echo "New version: v$NEW_VERSION"
+          echo "Build version: $NEW_VERSION"
+
+      - name: Build JAR
+        run: ./gradlew jar -Pversion=${{ steps.version.outputs.version }}
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WhitelistPlugin-${{ steps.version.outputs.version }}
+          path: build/libs/*.jar
 
       - name: Create and push tag
         if: github.event_name == 'workflow_dispatch'

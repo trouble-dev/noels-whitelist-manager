@@ -15,10 +15,13 @@ dependencies {
     compileOnly(files("libs/HytaleServer.jar"))
 }
 
+// Version aus Gradle Property oder Fallback
+val pluginVersion: String = project.findProperty("version")?.toString() ?: "dev"
+
 tasks.jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveBaseName.set("WhitelistPlugin")
-    archiveVersion.set("1.0.0")
+    archiveVersion.set(pluginVersion)
 
     from("src/main/resources")
 }
