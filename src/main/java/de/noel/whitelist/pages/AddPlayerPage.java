@@ -15,10 +15,12 @@ import com.hypixel.hytale.server.core.modules.accesscontrol.provider.HytaleWhite
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
+import com.hypixel.hytale.server.core.NameMatching;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.hypixel.hytale.server.core.util.AuthUtil;
 import javax.annotation.Nonnull;
+import java.util.UUID;
 
 public class AddPlayerPage extends InteractiveCustomUIPage<AddPlayerPage.AddEventData> {
 
@@ -98,23 +100,28 @@ public class AddPlayerPage extends InteractiveCustomUIPage<AddPlayerPage.AddEven
             username = username.trim();
             final String finalUsername = username;
 
-            // Look up UUID and add to whitelist
-            AuthUtil.lookupUuid(username).thenAccept(uuid -> {
-                HytaleWhitelistProvider provider = WhitelistPlugin.get().getWhitelistProvider();
+            // Check if player is online first - AuthUtil generates fake UUIDs for offline players!
+            PlayerRef targetPlayer = Universe.get().getPlayerByUsername(username, NameMatching.EXACT);
 
-                if (provider.modify(list -> list.add(uuid))) {
-                    playerRef.sendMessage(Message.raw("Added " + finalUsername + " to whitelist"));
-                } else {
-                    playerRef.sendMessage(Message.raw(finalUsername + " is already whitelisted"));
-                }
+            if (targetPlayer == null) {
+                // Player not online - show error
+                showError("Player must be online to add!");
+                playerRef.sendMessage(Message.raw("Error: " + finalUsername + " is not online. Players must be online to be added to whitelist."));
+                return;
+            }
 
-                // Navigate back to whitelist page
-                navigateToWhitelistPage();
-            }).exceptionally(ex -> {
-                playerRef.sendMessage(Message.raw("Failed to find player: " + finalUsername));
-                navigateToWhitelistPage();
-                return null;
-            });
+            // Player is online - get their real UUID
+            UUID uuid = targetPlayer.getUuid();
+            HytaleWhitelistProvider provider = WhitelistPlugin.get().getWhitelistProvider();
+
+            if (provider.modify(list -> list.add(uuid))) {
+                playerRef.sendMessage(Message.raw("Added " + finalUsername + " (" + uuid + ") to whitelist"));
+            } else {
+                playerRef.sendMessage(Message.raw(finalUsername + " is already whitelisted"));
+            }
+
+            // Navigate back to whitelist page
+            navigateToWhitelistPage();
         }
     }
 
