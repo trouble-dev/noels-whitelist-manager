@@ -1,6 +1,8 @@
 package de.noel.whitelist.pages;
 
 import de.noel.whitelist.WhitelistPlugin;
+import de.noel.whitelist.data.ConnectionAttempt;
+import de.noel.whitelist.data.ConnectionAttemptManager;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -20,6 +22,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import javax.annotation.Nonnull;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -65,6 +68,12 @@ public class WhitelistPage extends InteractiveCustomUIPage<WhitelistPage.Whiteli
 
         // Build player list
         buildPlayerList(commandBuilder, eventBuilder, whitelist);
+
+        // Build pending requests list
+        ConnectionAttemptManager attemptManager = WhitelistPlugin.get().getAttemptManager();
+        Collection<ConnectionAttempt> pending = attemptManager.getPendingAttempts();
+        commandBuilder.set("#PendingCount.Text", "PENDING REQUESTS (" + pending.size() + ")");
+        buildPendingList(commandBuilder, eventBuilder, pending);
 
         // Bind action buttons
         eventBuilder.addEventBinding(
@@ -131,6 +140,41 @@ public class WhitelistPage extends InteractiveCustomUIPage<WhitelistPage.Whiteli
         }
     }
 
+    private void buildPendingList(UICommandBuilder commandBuilder, UIEventBuilder eventBuilder, Collection<ConnectionAttempt> pending) {
+        commandBuilder.clear("#PendingList");
+
+        if (pending.isEmpty()) {
+            commandBuilder.appendInline("#PendingList", "Label { Text: \"No pending requests\"; Anchor: (Height: 40); Style: (FontSize: 14, TextColor: #6e7da1, HorizontalAlignment: Center, VerticalAlignment: Center); }");
+            return;
+        }
+
+        int i = 0;
+        for (ConnectionAttempt attempt : pending) {
+            String selector = "#PendingList[" + i + "]";
+            commandBuilder.append("#PendingList", "Pages/PendingEntry.ui");
+
+            commandBuilder.set(selector + " #PlayerName.Text", attempt.getUsername());
+            commandBuilder.set(selector + " #TimeAgo.Text", attempt.getFormattedTime());
+
+            // Accept button - adds to whitelist
+            eventBuilder.addEventBinding(
+                CustomUIEventBindingType.Activating,
+                selector + " #AcceptButton",
+                new EventData().append("Action", "Accept").append("UUID", attempt.getUuid().toString()),
+                false
+            );
+
+            // Dismiss button - removes from pending list
+            eventBuilder.addEventBinding(
+                CustomUIEventBindingType.Activating,
+                selector + " #DismissButton",
+                new EventData().append("Action", "Dismiss").append("UUID", attempt.getUuid().toString()),
+                false
+            );
+            i++;
+        }
+    }
+
     @Override
     public void handleDataEvent(
         @Nonnull Ref<EntityStore> ref,
@@ -154,6 +198,35 @@ public class WhitelistPage extends InteractiveCustomUIPage<WhitelistPage.Whiteli
                     UUID uuidToRemove = UUID.fromString(data.uuid);
                     provider.modify(list -> list.remove(uuidToRemove));
                     playerRef.sendMessage(Message.raw("Removed player from whitelist"));
+                    refreshPage(ref, store);
+                }
+                break;
+
+            case "Accept":
+                if (data.uuid != null) {
+                    UUID uuidToAccept = UUID.fromString(data.uuid);
+                    ConnectionAttemptManager attemptManager = WhitelistPlugin.get().getAttemptManager();
+                    ConnectionAttempt attempt = attemptManager.getAttempt(uuidToAccept);
+                    if (attempt != null) {
+                        // Add to whitelist
+                        if (provider.modify(list -> list.add(uuidToAccept))) {
+                            playerRef.sendMessage(Message.raw("Added " + attempt.getUsername() + " to whitelist"));
+                        } else {
+                            playerRef.sendMessage(Message.raw(attempt.getUsername() + " is already whitelisted"));
+                        }
+                        // Remove from pending
+                        attemptManager.removeAttempt(uuidToAccept);
+                    }
+                    refreshPage(ref, store);
+                }
+                break;
+
+            case "Dismiss":
+                if (data.uuid != null) {
+                    UUID uuidToDismiss = UUID.fromString(data.uuid);
+                    ConnectionAttemptManager attemptManager = WhitelistPlugin.get().getAttemptManager();
+                    attemptManager.removeAttempt(uuidToDismiss);
+                    playerRef.sendMessage(Message.raw("Dismissed pending request"));
                     refreshPage(ref, store);
                 }
                 break;
@@ -191,6 +264,12 @@ public class WhitelistPage extends InteractiveCustomUIPage<WhitelistPage.Whiteli
         commandBuilder.set("#PlayerCount.Text", "PLAYERS (" + whitelist.size() + ")");
 
         buildPlayerList(commandBuilder, eventBuilder, whitelist);
+
+        // Refresh pending list
+        ConnectionAttemptManager attemptManager = WhitelistPlugin.get().getAttemptManager();
+        Collection<ConnectionAttempt> pending = attemptManager.getPendingAttempts();
+        commandBuilder.set("#PendingCount.Text", "PENDING REQUESTS (" + pending.size() + ")");
+        buildPendingList(commandBuilder, eventBuilder, pending);
 
         sendUpdate(commandBuilder, eventBuilder, false);
     }

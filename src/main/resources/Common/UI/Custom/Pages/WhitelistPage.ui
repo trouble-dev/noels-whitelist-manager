@@ -1,5 +1,3 @@
-$C = "../Common.ui";
-
 @PrimaryButtonStyle = TextButtonStyle(
   Default: (Background: #3a7bd5, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
   Hovered: (Background: #4a8be5, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
@@ -19,44 +17,33 @@ $C = "../Common.ui";
 );
 
 Group {
-  Anchor: (Width: 500, Height: 450);
+  Anchor: (Width: 500, Height: 520);
   Background: #141c26(0.98);
   LayoutMode: Top;
   Padding: (Full: 20);
 
-  // Title
   Label {
     Text: "WHITELIST MANAGEMENT";
-    Anchor: (Height: 40);
-    Style: (
-      FontSize: 22,
-      TextColor: #ffffff,
-      HorizontalAlignment: Center,
-      RenderBold: true
-    );
+    Anchor: (Height: 36);
+    Style: (FontSize: 20, TextColor: #ffffff, HorizontalAlignment: Center, RenderBold: true);
   }
 
-  Group {
-    Anchor: (Height: 1);
-    Background: #2b3542;
-  }
+  Group { Anchor: (Height: 1); Background: #2b3542; }
+  Group { Anchor: (Height: 12); }
 
-  Group { Anchor: (Height: 16); }
-
-  // Status Section
   Group {
     LayoutMode: Left;
-    Anchor: (Height: 40);
+    Anchor: (Height: 36);
 
     Label {
       Text: "Status:";
-      Anchor: (Width: 80);
+      Anchor: (Width: 70);
       Style: (FontSize: 14, TextColor: #96a9be, VerticalAlignment: Center);
     }
 
     Label #StatusLabel {
       Text: "DISABLED";
-      Anchor: (Width: 100);
+      Anchor: (Width: 90);
       Style: (FontSize: 14, TextColor: #ff6b6b, RenderBold: true, VerticalAlignment: Center);
     }
 
@@ -64,64 +51,79 @@ Group {
 
     TextButton #ToggleButton {
       Text: "ENABLE";
-      Anchor: (Width: 100, Height: 32);
+      Anchor: (Width: 90, Height: 30);
       Style: @ToggleButtonStyle;
     }
   }
 
-  Group { Anchor: (Height: 16); }
+  Group { Anchor: (Height: 12); }
+  Group { Anchor: (Height: 1); Background: #2b3542(0.5); }
+  Group { Anchor: (Height: 8); }
 
-  Group {
-    Anchor: (Height: 1);
-    Background: #2b3542(0.5);
+  Label #PlayerCount {
+    Text: "PLAYERS (0)";
+    Anchor: (Height: 20);
+    Style: (FontSize: 11, TextColor: #4a5568, LetterSpacing: 2);
+  }
+
+  Group { Anchor: (Height: 4); }
+
+  Group #PlayerList {
+    Anchor: (Height: 100);
+    LayoutMode: Top;
+    Background: #0a1119(0.5);
+    Padding: (Full: 6);
+  }
+
+  Group { Anchor: (Height: 8); }
+  Group { Anchor: (Height: 1); Background: #2b3542(0.5); }
+  Group { Anchor: (Height: 8); }
+
+  Label #PendingCount {
+    Text: "PENDING REQUESTS (0)";
+    Anchor: (Height: 20);
+    Style: (FontSize: 11, TextColor: #e67e22, LetterSpacing: 2);
+  }
+
+  Group { Anchor: (Height: 4); }
+
+  Group #PendingList {
+    Anchor: (Height: 100);
+    LayoutMode: Top;
+    Background: #1a1a0a(0.5);
+    Padding: (Full: 6);
   }
 
   Group { Anchor: (Height: 12); }
 
-  // Player List Header
-  Label #PlayerCount {
-    Text: "PLAYERS (0)";
-    Anchor: (Height: 24);
-    Style: (FontSize: 11, TextColor: #4a5568, LetterSpacing: 2);
-  }
-
-  Group { Anchor: (Height: 8); }
-
-  // Player List Container (scrollable area)
-  Group #PlayerList {
-    FlexWeight: 1;
-    LayoutMode: Top;
-    Background: #0a1119(0.5);
-    Padding: (Full: 8);
-  }
-
-  Group { Anchor: (Height: 16); }
-
-  // Action Buttons
   Group {
-    LayoutMode: Center;
-    Anchor: (Height: 44);
+    LayoutMode: Left;
+    Anchor: (Height: 40);
+
+    Group { FlexWeight: 1; }
 
     TextButton #AddButton {
       Text: "+ ADD PLAYER";
-      Anchor: (Width: 140, Height: 38);
+      Anchor: (Width: 130, Height: 36);
       Style: @PrimaryButtonStyle;
     }
 
-    Group { Anchor: (Width: 12); }
+    Group { Anchor: (Width: 10); }
 
     TextButton #RefreshButton {
       Text: "REFRESH";
-      Anchor: (Width: 100, Height: 38);
+      Anchor: (Width: 90, Height: 36);
       Style: @SecondaryButtonStyle;
     }
 
-    Group { Anchor: (Width: 12); }
+    Group { Anchor: (Width: 10); }
 
     TextButton #CloseButton {
       Text: "CLOSE";
-      Anchor: (Width: 100, Height: 38);
+      Anchor: (Width: 90, Height: 36);
       Style: @SecondaryButtonStyle;
     }
+
+    Group { FlexWeight: 1; }
   }
 }

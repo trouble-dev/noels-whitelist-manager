@@ -1,5 +1,3 @@
-$C = "../Common.ui";
-
 @PrimaryButtonStyle = TextButtonStyle(
   Default: (Background: #3a7bd5, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
   Hovered: (Background: #4a8be5, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
@@ -13,76 +11,91 @@ $C = "../Common.ui";
 );
 
 Group {
-  Anchor: (Width: 400, Height: 260);
+  Anchor: (Width: 380, Height: 280);
   Background: #141c26(0.98);
   LayoutMode: Top;
-  Padding: (Full: 24);
+  Padding: (Full: 20);
 
-  // Title
   Label {
-    Text: "ADD PLAYER TO WHITELIST";
-    Anchor: (Height: 40);
-    Style: (
-      FontSize: 20,
-      TextColor: #ffffff,
-      HorizontalAlignment: Center,
-      RenderBold: true
-    );
+    Text: "ADD PLAYER";
+    Anchor: (Height: 36);
+    Style: (FontSize: 18, TextColor: #ffffff, HorizontalAlignment: Center, RenderBold: true);
   }
 
-  Group {
-    Anchor: (Height: 1);
-    Background: #2b3542;
-  }
+  Group { Anchor: (Height: 1); Background: #2b3542; }
+  Group { Anchor: (Height: 16); }
 
-  Group { Anchor: (Height: 20); }
-
-  // Input Section
   Group {
     LayoutMode: Left;
-    Anchor: (Height: 44);
+    Anchor: (Height: 38);
 
     Label {
-      Text: "Player Name";
-      Anchor: (Width: 110);
+      Text: "Name:";
+      Anchor: (Width: 70);
       Style: (FontSize: 14, TextColor: #96a9be, VerticalAlignment: Center);
     }
 
-    $C.@TextField #NameInput {
+    TextField #NameInput {
       FlexWeight: 1;
-      PlaceholderText: "Enter username...";
+      Anchor: (Height: 34);
+      Padding: (Horizontal: 8);
+      Background: #0a1119;
+      PlaceholderText: "Username (online)";
+    }
+  }
+
+  Group { Anchor: (Height: 10); }
+
+  Group {
+    LayoutMode: Left;
+    Anchor: (Height: 38);
+
+    Label {
+      Text: "UUID:";
+      Anchor: (Width: 70);
+      Style: (FontSize: 14, TextColor: #96a9be, VerticalAlignment: Center);
+    }
+
+    TextField #UuidInput {
+      FlexWeight: 1;
+      Anchor: (Height: 34);
+      Padding: (Horizontal: 8);
+      Background: #0a1119;
+      PlaceholderText: "Or enter UUID directly";
     }
   }
 
   Group { Anchor: (Height: 12); }
 
-  // Error Message (hidden by default)
   Label #Error {
     Text: "";
-    Anchor: (Height: 24);
+    Anchor: (Height: 20);
     Visible: false;
     Style: (FontSize: 12, TextColor: #ff6b6b, HorizontalAlignment: Center);
   }
 
   Group { FlexWeight: 1; }
 
-  // Action Buttons
   Group {
-    LayoutMode: Center;
-    Anchor: (Height: 44);
+    LayoutMode: Left;
+    Anchor: (Height: 40);
+
+    Group { FlexWeight: 1; }
 
     TextButton #ConfirmButton {
       Text: "ADD";
-      Anchor: (Width: 110, Height: 40);
+      Anchor: (Width: 100, Height: 36);
       Style: @PrimaryButtonStyle;
     }
 
-    Group { Anchor: (Width: 16); }
+    Group { Anchor: (Width: 12); }
 
     TextButton #CancelButton {
       Text: "CANCEL";
-      Anchor: (Width: 110, Height: 40);
+      Anchor: (Width: 100, Height: 36);
       Style: @CancelButtonStyle;
     }
+
+    Group { FlexWeight: 1; }
   }
 }

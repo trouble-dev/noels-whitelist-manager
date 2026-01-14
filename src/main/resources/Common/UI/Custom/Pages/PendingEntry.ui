@@ -1,0 +1,46 @@
+@AcceptButtonStyle = TextButtonStyle(
+  Default: (Background: #27ae60, LabelStyle: (FontSize: 11, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #2ecc71, LabelStyle: (FontSize: 11, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #1e8449, LabelStyle: (FontSize: 11, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+);
+
+@DismissButtonStyle = TextButtonStyle(
+  Default: (Background: #7f8c8d, LabelStyle: (FontSize: 11, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #95a5a6, LabelStyle: (FontSize: 11, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #6c7a7b, LabelStyle: (FontSize: 11, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+);
+
+Group {
+  LayoutMode: Left;
+  Anchor: (Height: 32);
+  Background: #2b3542(0.3);
+  Padding: (Horizontal: 10, Vertical: 4);
+
+  Label #PlayerName {
+    Text: "Unknown";
+    Anchor: (Width: 140);
+    Style: (FontSize: 13, TextColor: #e67e22, VerticalAlignment: Center, RenderBold: true);
+  }
+
+  Label #TimeAgo {
+    Text: "5m ago";
+    Anchor: (Width: 60);
+    Style: (FontSize: 11, TextColor: #6e7da1, VerticalAlignment: Center);
+  }
+
+  Group { FlexWeight: 1; }
+
+  TextButton #AcceptButton {
+    Text: "ADD";
+    Anchor: (Width: 50, Height: 24);
+    Style: @AcceptButtonStyle;
+  }
+
+  Group { Anchor: (Width: 6); }
+
+  TextButton #DismissButton {
+    Text: "X";
+    Anchor: (Width: 26, Height: 24);
+    Style: @DismissButtonStyle;
+  }
+}

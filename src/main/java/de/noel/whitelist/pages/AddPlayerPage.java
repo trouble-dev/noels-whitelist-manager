@@ -31,12 +31,15 @@ public class AddPlayerPage extends InteractiveCustomUIPage<AddPlayerPage.AddEven
     public static class AddEventData {
         public String action;
         public String playerName;
+        public String playerUuid;
 
-        public static final BuilderCodec<AddEventData> CODEC = ((BuilderCodec.Builder<AddEventData>) ((BuilderCodec.Builder<AddEventData>)
+        public static final BuilderCodec<AddEventData> CODEC = ((BuilderCodec.Builder<AddEventData>) ((BuilderCodec.Builder<AddEventData>) ((BuilderCodec.Builder<AddEventData>)
             BuilderCodec.builder(AddEventData.class, AddEventData::new)
                 .append(new KeyedCodec<>("Action", Codec.STRING), (AddEventData o, String v) -> o.action = v, (AddEventData o) -> o.action)
                 .add())
                 .append(new KeyedCodec<>("@PlayerName", Codec.STRING), (AddEventData o, String v) -> o.playerName = v, (AddEventData o) -> o.playerName)
+                .add())
+                .append(new KeyedCodec<>("@PlayerUUID", Codec.STRING), (AddEventData o, String v) -> o.playerUuid = v, (AddEventData o) -> o.playerUuid)
                 .add())
             .build();
     }
@@ -54,13 +57,14 @@ public class AddPlayerPage extends InteractiveCustomUIPage<AddPlayerPage.AddEven
     ) {
         commandBuilder.append("Pages/AddPlayerPage.ui");
 
-        // Bind confirm button - capture input value
+        // Bind confirm button - capture both input values
         eventBuilder.addEventBinding(
             CustomUIEventBindingType.Activating,
             "#ConfirmButton",
             new EventData()
                 .append("Action", "Confirm")
                 .append("@PlayerName", "#NameInput.Value")
+                .append("@PlayerUUID", "#UuidInput.Value")
         );
 
         // Bind cancel button
@@ -90,34 +94,50 @@ public class AddPlayerPage extends InteractiveCustomUIPage<AddPlayerPage.AddEven
         }
 
         if ("Confirm".equals(data.action)) {
-            String username = data.playerName;
+            String username = data.playerName != null ? data.playerName.trim() : "";
+            String uuidStr = data.playerUuid != null ? data.playerUuid.trim() : "";
 
-            if (username == null || username.trim().isEmpty()) {
-                showError("Please enter a player name");
+            UUID uuid = null;
+            String displayName = null;
+
+            // Option 1: UUID was provided directly
+            if (!uuidStr.isEmpty()) {
+                try {
+                    uuid = UUID.fromString(uuidStr);
+                    displayName = uuidStr.substring(0, 8) + "...";
+                } catch (IllegalArgumentException e) {
+                    showError("Invalid UUID format!");
+                    return;
+                }
+            }
+            // Option 2: Username provided - check if player is online
+            else if (!username.isEmpty()) {
+                PlayerRef targetPlayer = Universe.get().getPlayerByUsername(username, NameMatching.EXACT);
+
+                if (targetPlayer != null) {
+                    uuid = targetPlayer.getUuid();
+                    displayName = username;
+                } else {
+                    showError("Player not online! Use UUID instead.");
+                    playerRef.sendMessage(Message.raw("Tip: Player must be online OR enter their UUID directly."));
+                    return;
+                }
+            }
+            // Neither provided
+            else {
+                showError("Enter username OR UUID!");
                 return;
             }
 
-            username = username.trim();
-            final String finalUsername = username;
-
-            // Check if player is online first - AuthUtil generates fake UUIDs for offline players!
-            PlayerRef targetPlayer = Universe.get().getPlayerByUsername(username, NameMatching.EXACT);
-
-            if (targetPlayer == null) {
-                // Player not online - show error
-                showError("Player must be online to add!");
-                playerRef.sendMessage(Message.raw("Error: " + finalUsername + " is not online. Players must be online to be added to whitelist."));
-                return;
-            }
-
-            // Player is online - get their real UUID
-            UUID uuid = targetPlayer.getUuid();
+            // Add to whitelist
             HytaleWhitelistProvider provider = WhitelistPlugin.get().getWhitelistProvider();
+            final UUID finalUuid = uuid;
+            final String finalDisplayName = displayName;
 
-            if (provider.modify(list -> list.add(uuid))) {
-                playerRef.sendMessage(Message.raw("Added " + finalUsername + " (" + uuid + ") to whitelist"));
+            if (provider.modify(list -> list.add(finalUuid))) {
+                playerRef.sendMessage(Message.raw("Added " + finalDisplayName + " (" + finalUuid + ") to whitelist"));
             } else {
-                playerRef.sendMessage(Message.raw(finalUsername + " is already whitelisted"));
+                playerRef.sendMessage(Message.raw("Player is already whitelisted"));
             }
 
             // Navigate back to whitelist page
