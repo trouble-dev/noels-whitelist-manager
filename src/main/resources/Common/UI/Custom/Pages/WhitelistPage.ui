@@ -17,7 +17,7 @@
 );
 
 Group {
-  Anchor: (Width: 500, Height: 520);
+  Anchor: (Width: 500, Height: 560);
   Background: #141c26(0.98);
   LayoutMode: Top;
   Padding: (Full: 20);
@@ -69,10 +69,11 @@ Group {
   Group { Anchor: (Height: 4); }
 
   Group #PlayerList {
-    Anchor: (Height: 100);
-    LayoutMode: Top;
+    Anchor: (Height: 120);
+    LayoutMode: TopScrolling;
     Background: #0a1119(0.5);
     Padding: (Full: 6);
+    ScrollbarStyle: (Spacing: 4, Size: 4);
   }
 
   Group { Anchor: (Height: 8); }
@@ -88,10 +89,11 @@ Group {
   Group { Anchor: (Height: 4); }
 
   Group #PendingList {
-    Anchor: (Height: 100);
-    LayoutMode: Top;
+    Anchor: (Height: 120);
+    LayoutMode: TopScrolling;
     Background: #1a1a0a(0.5);
     Padding: (Full: 6);
+    ScrollbarStyle: (Spacing: 4, Size: 4);
   }
 
   Group { Anchor: (Height: 12); }
