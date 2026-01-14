@@ -1,0 +1,88 @@
+$C = "../Common.ui";
+
+@PrimaryButtonStyle = TextButtonStyle(
+  Default: (Background: #3a7bd5, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #4a8be5, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #2a6bc5, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+);
+
+@CancelButtonStyle = TextButtonStyle(
+  Default: (Background: #4a5568, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #5a6578, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #3a4558, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+);
+
+Group {
+  Anchor: (Width: 400, Height: 260);
+  Background: #141c26(0.98);
+  LayoutMode: Top;
+  Padding: (Full: 24);
+
+  // Title
+  Label {
+    Text: "ADD PLAYER TO WHITELIST";
+    Anchor: (Height: 40);
+    Style: (
+      FontSize: 20,
+      TextColor: #ffffff,
+      HorizontalAlignment: Center,
+      RenderBold: true
+    );
+  }
+
+  Group {
+    Anchor: (Height: 1);
+    Background: #2b3542;
+  }
+
+  Group { Anchor: (Height: 20); }
+
+  // Input Section
+  Group {
+    LayoutMode: Left;
+    Anchor: (Height: 44);
+
+    Label {
+      Text: "Player Name";
+      Anchor: (Width: 110);
+      Style: (FontSize: 14, TextColor: #96a9be, VerticalAlignment: Center);
+    }
+
+    $C.@TextField #NameInput {
+      FlexWeight: 1;
+      PlaceholderText: "Enter username...";
+    }
+  }
+
+  Group { Anchor: (Height: 12); }
+
+  // Error Message (hidden by default)
+  Label #Error {
+    Text: "";
+    Anchor: (Height: 24);
+    Visible: false;
+    Style: (FontSize: 12, TextColor: #ff6b6b, HorizontalAlignment: Center);
+  }
+
+  Group { FlexWeight: 1; }
+
+  // Action Buttons
+  Group {
+    LayoutMode: Center;
+    Anchor: (Height: 44);
+
+    TextButton #ConfirmButton {
+      Text: "ADD";
+      Anchor: (Width: 110, Height: 40);
+      Style: @PrimaryButtonStyle;
+    }
+
+    Group { Anchor: (Width: 16); }
+
+    TextButton #CancelButton {
+      Text: "CANCEL";
+      Anchor: (Width: 110, Height: 40);
+      Style: @CancelButtonStyle;
+    }
+  }
+}
