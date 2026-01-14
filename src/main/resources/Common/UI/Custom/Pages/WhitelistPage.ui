@@ -73,7 +73,14 @@ Group {
     LayoutMode: TopScrolling;
     Background: #0a1119(0.5);
     Padding: (Full: 6);
-    ScrollbarStyle: (Spacing: 4, Size: 4);
+    ScrollbarStyle: (
+      Spacing: 6,
+      Size: 6,
+      Background: (TexturePath: "Common/Scrollbar.png", Border: 3),
+      Handle: (TexturePath: "Common/ScrollbarHandle.png", Border: 3),
+      HoveredHandle: (TexturePath: "Common/ScrollbarHandleHovered.png", Border: 3),
+      DraggedHandle: (TexturePath: "Common/ScrollbarHandleDragged.png", Border: 3)
+    );
   }
 
   Group { Anchor: (Height: 8); }
@@ -93,7 +100,14 @@ Group {
     LayoutMode: TopScrolling;
     Background: #1a1a0a(0.5);
     Padding: (Full: 6);
-    ScrollbarStyle: (Spacing: 4, Size: 4);
+    ScrollbarStyle: (
+      Spacing: 6,
+      Size: 6,
+      Background: (TexturePath: "Common/Scrollbar.png", Border: 3),
+      Handle: (TexturePath: "Common/ScrollbarHandle.png", Border: 3),
+      HoveredHandle: (TexturePath: "Common/ScrollbarHandleHovered.png", Border: 3),
+      DraggedHandle: (TexturePath: "Common/ScrollbarHandleDragged.png", Border: 3)
+    );
   }
 
   Group { Anchor: (Height: 12); }
